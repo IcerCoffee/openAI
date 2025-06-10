@@ -17,6 +17,9 @@ NS_ASSUME_NONNULL_BEGIN
 + (NSString *)decryptAES128WithBase64String:(NSString *)base64String key:(NSString *)key;
 
 -(void)voiceRecognitionService:(NSURL *)fileUrl;
+
+/// Send a UDP message which can be triggered from H5
+- (void)sendUDPMessage:(NSString *)message broadcastIP:(NSString *)ip;
 @end
 
 NS_ASSUME_NONNULL_END

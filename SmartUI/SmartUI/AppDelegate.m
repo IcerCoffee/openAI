@@ -8,6 +8,7 @@
 #import "AppDelegate.h"
 #import "ViewController.h"
 #import "CommonUtils.h"
+#import "UDPManager.h"
 #import <insideSDK/InsideSDK.h>
 #import <IQKeyboardManager/IQKeyboardManager.h>
 @interface AppDelegate ()
@@ -31,7 +32,10 @@
     self.window.backgroundColor = [UIColor whiteColor];
     self.window.rootViewController = nav;
     [self.window makeKeyAndVisible];
-    
+
+    // Start UDP listener on port 12306
+    [[UDPManager sharedInstance] startListening];
+
     return YES;
 }
 

@@ -8,6 +8,7 @@
 #import "CommonUtils.h"
 #import <CommonCrypto/CommonCrypto.h>
 #import <WtvASRSDK/WtvASRSDK.h>
+#import "UDPManager.h"
 @implementation CommonUtils
 
 + (instancetype)sharedInstance{
@@ -15,6 +16,7 @@
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         _sharedInstance = [[CommonUtils alloc] init];
+        [[NSNotificationCenter defaultCenter] addObserver:_sharedInstance selector:@selector(handleUDPMessage:) name:UDPManagerDidReceiveNotification object:nil];
     });
     return _sharedInstance;
 }
@@ -36,6 +38,19 @@
             NSLog(@"识别的文字：%@",msg);
         }
     }];
+}
+
+// JS 调用此方法发送 UDP 广播
+- (void)sendUDPMessage:(NSString *)message broadcastIP:(NSString *)ip {
+    if (ip.length > 0) {
+        [UDPManager sharedInstance].broadcastAddress = ip;
+    }
+    [[UDPManager sharedInstance] sendMessage:message];
+}
+
+- (void)handleUDPMessage:(NSNotification *)noti {
+    NSString *msg = noti.userInfo[UDPManagerMessageKey];
+    NSLog(@"Received UDP message: %@", msg);
 }
 
 
