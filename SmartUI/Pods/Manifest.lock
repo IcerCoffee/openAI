@@ -1,0 +1,97 @@
+PODS:
+  - AFNetworking (4.0.1):
+    - AFNetworking/NSURLSession (= 4.0.1)
+    - AFNetworking/Reachability (= 4.0.1)
+    - AFNetworking/Security (= 4.0.1)
+    - AFNetworking/Serialization (= 4.0.1)
+    - AFNetworking/UIKit (= 4.0.1)
+  - AFNetworking/NSURLSession (4.0.1):
+    - AFNetworking/Reachability
+    - AFNetworking/Security
+    - AFNetworking/Serialization
+  - AFNetworking/Reachability (4.0.1)
+  - AFNetworking/Security (4.0.1)
+  - AFNetworking/Serialization (4.0.1)
+  - AFNetworking/UIKit (4.0.1):
+    - AFNetworking/NSURLSession
+  - Alamofire (4.9.1)
+  - CryptoSwift (1.8.4)
+  - GTMBase64 (1.0.1)
+  - insideSDK (0.1.0):
+    - Masonry (= 1.1.0)
+  - IQKeyboardManager (6.5.19)
+  - KakaJSON (1.1.2)
+  - LookinServer (1.2.8):
+    - LookinServer/Core (= 1.2.8)
+  - LookinServer/Core (1.2.8)
+  - Masonry (1.1.0)
+  - MJExtension (3.4.2)
+  - SDWebImage (5.19.0):
+    - SDWebImage/Core (= 5.19.0)
+  - SDWebImage/Core (5.19.0)
+  - SkeletonView (1.30.4)
+  - SnapKit (5.7.1)
+  - YTKNetwork (3.0.6):
+    - AFNetworking/NSURLSession (~> 4.0)
+
+DEPENDENCIES:
+  - AFNetworking (= 4.0.1)
+  - Alamofire (= 4.9.1)
+  - CryptoSwift (from `https://github.com/krzyzanowskim/CryptoSwift.git`)
+  - GTMBase64
+  - insideSDK (from `../insideSDK`)
+  - IQKeyboardManager
+  - KakaJSON
+  - LookinServer
+  - Masonry (= 1.1.0)
+  - MJExtension
+  - SDWebImage (= 5.19.0)
+  - SkeletonView
+  - SnapKit
+  - YTKNetwork (= 3.0.6)
+
+SPEC REPOS:
+  trunk:
+    - AFNetworking
+    - Alamofire
+    - GTMBase64
+    - IQKeyboardManager
+    - KakaJSON
+    - LookinServer
+    - Masonry
+    - MJExtension
+    - SDWebImage
+    - SkeletonView
+    - SnapKit
+    - YTKNetwork
+
+EXTERNAL SOURCES:
+  CryptoSwift:
+    :git: https://github.com/krzyzanowskim/CryptoSwift.git
+  insideSDK:
+    :path: "../insideSDK"
+
+CHECKOUT OPTIONS:
+  CryptoSwift:
+    :commit: 416a57ee940e0bdf29ef1dae042722d1b147b790
+    :git: https://github.com/krzyzanowskim/CryptoSwift.git
+
+SPEC CHECKSUMS:
+  AFNetworking: 3bd23d814e976cd148d7d44c3ab78017b744cd58
+  Alamofire: 85e8a02c69d6020a0d734f6054870d7ecb75cf18
+  CryptoSwift: e64e11850ede528a02a0f3e768cec8e9d92ecb90
+  GTMBase64: f0f91be06a7a20b84c8e4fee30c0430395091d82
+  insideSDK: 1e91c429cf80d9dc7905556028d6600031f63c94
+  IQKeyboardManager: c8665b3396bd0b79402b4c573eac345a31c7d485
+  KakaJSON: cc5ff50a8c1cfbb09413db8496cb709a209e6137
+  LookinServer: 1b2b61c6402ae29fa22182d48f5cd067b4e99e80
+  Masonry: 678fab65091a9290e40e2832a55e7ab731aad201
+  MJExtension: e97d164cb411aa9795cf576093a1fa208b4a8dd8
+  SDWebImage: 981fd7e860af070920f249fd092420006014c3eb
+  SkeletonView: 5a050f6411e697abd4cda0a8d767013399dccd69
+  SnapKit: d612e99e678a2d3b95bf60b0705ed0a35c03484a
+  YTKNetwork: c16be90b06be003de9e9cd0d3b187cc8eaf35c04
+
+PODFILE CHECKSUM: a9e170c5eb14b403832522f0888643453f300d50
+
+COCOAPODS: 1.13.0

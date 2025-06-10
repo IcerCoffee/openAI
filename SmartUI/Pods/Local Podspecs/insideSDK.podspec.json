@@ -1,0 +1,28 @@
+{
+  "name": "insideSDK",
+  "version": "0.1.0",
+  "summary": "A short description of insideSDK.",
+  "description": "TODO: Add long description of the pod here.",
+  "homepage": "https://github.com/王弘宇/insideSDK",
+  "license": {
+    "type": "MIT",
+    "file": "LICENSE"
+  },
+  "authors": {
+    "王弘宇": "519103250@qq.com"
+  },
+  "source": {
+    "git": "https://github.com/王弘宇/insideSDK.git",
+    "tag": "0.1.0"
+  },
+  "platforms": {
+    "ios": "10.0"
+  },
+  "source_files": "insideSDK/Classes/**/*",
+  "public_header_files": "insideSDK/Classes/*.h",
+  "dependencies": {
+    "Masonry": [
+      "1.1.0"
+    ]
+  }
+}
