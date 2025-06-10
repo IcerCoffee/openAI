@@ -1,0 +1,6 @@
+framework module WtvASRSDK {
+  umbrella header "WtvASRSDK.h"
+  export *
+
+  module * { export * }
+}
