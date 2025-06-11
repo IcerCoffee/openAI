@@ -13,18 +13,7 @@
 import UIKit
 import SnapKit
 
-// MARK: - Message 模型
-enum MessageType {
-    case user       // 用户提问
-    case loading    // AI 思考中
-    case ai         // AI 回答中
-    case rating     // 好评、差评
-}
-
-struct Message {
-    let text: String
-    let type: MessageType
-}
+/// View layer for simple chat demo. Logic is handled by ChatViewModel
 
 // MARK: - ChatViewController
 class ChatViewController: UIViewController {
@@ -37,26 +26,22 @@ class ChatViewController: UIViewController {
         tv.register(UserCell.self, forCellReuseIdentifier: "UserCell")
         tv.register(LoadingCell.self, forCellReuseIdentifier: "LoadingCell")
         tv.register(AICell.self, forCellReuseIdentifier: "AICell")
-        tv.register(RatingCell.self, forCellReuseIdentifier: "RatingCell")
         tv.dataSource = self
         return tv
     }()
     
-    private var messages: [Message] = []
+    private let viewModel = ChatViewModel()
     private let initialQuestion = "摄像头离线了怎么办？"
-    private let answerText = """
-    您好，若摄像头直播页面出现“设备已离线”，一般是设备硬件损坏或网络波动导致，请您：
-    （1）首先查看摄像机指示灯是否正常（绿灯长亮为设备正常状态），如绿灯闪烁，则尝试将网线拔掉，过5秒左右重新插入，等待摄像头上线（一般一分钟之内摄像头会自动上线）。
-    （2）设备指示灯为长绿灯常亮，APP上显示离线，则退出APP，重新登录查看状态。如仍然无效，则拔插摄像机电源，确认设备状态。
-    （3）如果上述操作都无法解决问题，建议从客户端将摄像头解绑，摄像头长按Reset按键复位（Reset按键需要拧开二维码下面的螺丝才能看到），重新进行绑定操作。
-    """
     
     override var inputAccessoryView: UIView? { chatInputView }
     override var canBecomeFirstResponder: Bool { true }
     
     private lazy var chatInputView: ChatInputView = {
         let v = ChatInputView()
-        v.sendAction = { [weak self] text in self?.send(text: text) }
+        v.sendAction = { [weak self] text in
+            self?.viewModel.send(question: text)
+            self?.chatInputView.clear()
+        }
         return v
     }()
     
@@ -65,6 +50,11 @@ class ChatViewController: UIViewController {
         view.backgroundColor = .white
         view.addSubview(tableView)
         tableView.snp.makeConstraints { make in make.edges.equalToSuperview() }
+        viewModel.onMessagesUpdated = { [weak self] in
+            guard let self = self else { return }
+            self.tableView.reloadData()
+            self.scrollToBottom()
+        }
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(keyboardChanged(_:)),
                                                name: UIResponder.keyboardWillChangeFrameNotification,
@@ -73,8 +63,8 @@ class ChatViewController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        if messages.isEmpty {
-            send(text: initialQuestion)
+        if viewModel.messages.isEmpty {
+            viewModel.send(question: initialQuestion)
         }
     }
     
@@ -84,48 +74,10 @@ class ChatViewController: UIViewController {
         scrollToBottom()
     }
     
-    private func send(text: String) {
-        guard !text.isEmpty else { return }
-        // 添加用户消息
-        messages.append(.init(text: text, type: .user))
-        tableView.reloadData(); scrollToBottom()
-        // 添加 loading
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            self.messages.append(.init(text: "通通分析中。。。", type: .loading))
-            self.tableView.reloadData(); self.scrollToBottom()
-            // 模拟思考
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                if let idx = self.messages.firstIndex(where: { $0.type == .loading }) {
-                    self.messages.remove(at: idx)
-                }
-                self.messages.append(.init(text: "", type: .ai))
-                self.tableView.reloadData(); self.scrollToBottom()
-                self.typeAnswer()
-            }
-        }
-    }
-    
-    private func typeAnswer() {
-        guard let idx = messages.firstIndex(where: { $0.type == .ai }) else { return }
-        var current = ""
-        let chars = Array(answerText)
-        var i = 0
-        Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { timer in
-            if i < chars.count {
-                current.append(chars[i]); i += 1
-                self.messages[idx] = .init(text: current, type: .ai)
-                self.tableView.reloadRows(at: [IndexPath(row: idx, section: 0)], with: .none)
-                self.scrollToBottom()
-            } else {
-                timer.invalidate()
-                self.messages.append(.init(text: "", type: .rating))
-                self.tableView.reloadData(); self.scrollToBottom()
-            }
-        }
-    }
+
     
     private func scrollToBottom() {
-        let last = messages.count - 1
+        let last = viewModel.messages.count - 1
         guard last >= 0 else { return }
         tableView.scrollToRow(at: IndexPath(row: last, section: 0), at: .bottom, animated: true)
     }
@@ -134,10 +86,10 @@ class ChatViewController: UIViewController {
 // MARK: - UITableViewDataSource
 extension ChatViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        messages.count
+        viewModel.messages.count
     }
     func tableView(_ tv: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let msg = messages[indexPath.row]
+        let msg = viewModel.messages[indexPath.row]
         switch msg.type {
         case .user:
             let cell = tv.dequeueReusableCell(withIdentifier: "UserCell", for: indexPath) as! UserCell
@@ -148,9 +100,6 @@ extension ChatViewController: UITableViewDataSource {
         case .ai:
             let cell = tv.dequeueReusableCell(withIdentifier: "AICell", for: indexPath) as! AICell
             cell.label.text = msg.text; return cell
-        case .rating:
-            let cell = tv.dequeueReusableCell(withIdentifier: "RatingCell", for: indexPath) as! RatingCell
-            cell.onRate = { good in print(good ? "用户好评" : "用户差评") }; return cell
         }
     }
 }
@@ -225,42 +174,6 @@ class LoadingCell: BaseCell {
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
 }
 
-class RatingCell: UITableViewCell {
-    var onRate: ((Bool) -> Void)?
-    private let goodBtn = UIButton(type: .system)
-    private let badBtn = UIButton(type: .system)
-    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-        super.init(style: style, reuseIdentifier: reuseIdentifier)
-        selectionStyle = .none
-        contentView.addSubview(goodBtn)
-        contentView.addSubview(badBtn)
-        goodBtn.setTitle("好评", for: .normal)
-        badBtn.setTitle("差评", for: .normal)
-        goodBtn.layer.cornerRadius = 4
-        badBtn.layer.cornerRadius = 4
-        goodBtn.layer.borderWidth = 0.5
-        badBtn.layer.borderWidth = 0.5
-        goodBtn.layer.borderColor = UIColor(hexString: "#4CAF50").cgColor
-        badBtn.layer.borderColor = UIColor(hexString: "#F44336").cgColor
-        goodBtn.snp.makeConstraints { make in
-            make.top.bottom.equalToSuperview().inset(12)
-            make.trailing.equalTo(contentView.snp.centerX).offset(-8)
-            make.width.equalTo(80)
-            make.height.equalTo(36)
-        }
-        badBtn.snp.makeConstraints { make in
-            make.top.bottom.equalToSuperview().inset(12)
-            make.leading.equalTo(contentView.snp.centerX).offset(8)
-            make.width.equalTo(80)
-            make.height.equalTo(36)
-        }
-        goodBtn.addTarget(self, action: #selector(rateGood), for: .touchUpInside)
-        badBtn.addTarget(self, action: #selector(rateBad), for: .touchUpInside)
-    }
-    @objc private func rateGood() { onRate?(true) }
-    @objc private func rateBad()  { onRate?(false) }
-    required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
-}
 
 // MARK: - ChatInputView
 class ChatInputView: UIView {
